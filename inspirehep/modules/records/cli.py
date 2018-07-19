@@ -22,12 +22,18 @@
 
 from __future__ import absolute_import, division, print_function
 
+from time import sleep
+
 import click
 import click_spinner
 
+from invenio_db import db
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
+from flask import current_app
 from flask.cli import with_appcontext
 
 from .checkers import check_unlinked_references
+from .tasks import batch_reindex
 
 
 @click.group()
@@ -59,3 +65,109 @@ def unlinked_references(doi_file_name, arxiv_file_name):
 
     for item in result_arxiv:
         arxiv_file_name.write(u'{i[0]}: {i[1]}\n'.format(i=item))
+
+
+def next_batch(iterator, batch_size):
+    """Get first batch_size elements from the iterable, or remaining if less.
+
+    :param iterator: the iterator for the iterable
+    :param batch_size: size of the requested batch
+    :return: batch (list)
+    """
+    batch = []
+
+    try:
+        for idx in range(batch_size):
+            batch.append(next(iterator))
+    except StopIteration:
+        pass
+
+    return batch
+
+
+@click.command()
+@click.option('--yes-i-know', is_flag=True)
+@click.option('-t', '--pid-type', multiple=True, required=True)
+@click.option('-s', '--batch-size', default=200)
+@click.option('-q', '--queue-name', default='indexer_task')
+@with_appcontext
+def simpleindex(yes_i_know, pid_type, batch_size, queue_name):
+    """Bulk reindex all records in a parallel manner.
+
+    :param yes_i_know: if True, skip confirmation screen
+    :param pid_type: array of PID types, allowed: lit, con, exp, jou, aut, job, ins
+    :param batch_size: number of documents per batch sent to workers.
+    :param queue_name: name of the celery queue
+    """
+    if not yes_i_know:
+        click.confirm(
+            'Do you really want to reindex the record?',
+            abort=True,
+        )
+
+    click.secho('Sending record UUIDs to the indexing queue...', fg='green')
+
+    query = (
+        db.session.query(PersistentIdentifier.object_uuid)
+        .filter(
+            PersistentIdentifier.pid_type.in_(pid_type),
+            PersistentIdentifier.object_type == 'rec',
+            PersistentIdentifier.status == PIDStatus.REGISTERED,
+        )
+    )
+    request_timeout = current_app.config.get('INDEXER_BULK_REQUEST_TIMEOUT')
+    all_tasks = []
+
+    with click.progressbar(
+        query.yield_per(2000),
+        length=query.count(),
+        label='Scheduling indexing tasks'
+    ) as items:
+        batch = next_batch(items, batch_size)
+
+        while batch:
+            indexer_task = batch_reindex.apply_async(
+                kwargs={
+                    'uuids': [str(item[0]) for item in batch],
+                    'request_timeout': request_timeout,
+                },
+                queue=queue_name,
+            )
+
+            all_tasks.append(indexer_task)
+            batch = next_batch(items, batch_size)
+
+    click.secho('Created {} tasks.'.format(len(all_tasks)), fg='green')
+
+    with click.progressbar(
+        length=len(all_tasks),
+        label='Indexing records'
+    ) as progressbar:
+        def _finished_tasks_count():
+            return len(filter(lambda task: task.ready(), all_tasks))
+
+        while len(all_tasks) != _finished_tasks_count():
+            sleep(0.5)
+            # this is so click doesn't divide by 0:
+            progressbar.pos = _finished_tasks_count() or 1
+            progressbar.update(0)
+
+    successes = sum([task.result.get('success', 0) for task in all_tasks])
+    failures = sum([task.result.get('failures', []) for task in all_tasks], [])
+
+    color = 'red' if failures else 'green'
+    click.secho(
+        'Reindexing failed for {} records, succeeded for {}.'.format(
+            len(failures),
+            successes
+        ),
+        fg=color,
+    )
+
+    log_path = '/tmp/records_index.err'
+    with open(log_path, 'w') as log:
+        for failure in failures:
+            log.write('%s\n' % repr(failure))
+
+    if failures:
+        click.secho('You can see the errors in %s' % log_path)
