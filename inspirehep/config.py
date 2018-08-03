@@ -36,6 +36,7 @@ from invenio_records_rest.facets import range_filter, terms_filter
 
 from inspire_matcher.config import MATCHER_DEFAULT_CONFIGURATION as exact_match
 
+
 # Debug
 # =====
 DEBUG_TB_INTERCEPT_REDIRECTS = False
@@ -208,6 +209,109 @@ RECORD_EDITOR_FILE_UPLOAD_FOLDER = 'inspirehep/modules/editor/temp'
 # On production, if you enable celery beat change this path to point to a shared space.
 REFEXTRACT_JOURNAL_KB_PATH = pkg_resources.resource_filename('refextract', 'references/kbs/journal-titles.kb')
 
+INSPIRE_COLLECTIONS_DEFINITION = [
+    {
+        'query': '_collections:Literature',
+        'name': 'Literature',
+    },
+    {
+        'query': '_collections:Authors',
+        'name': 'Authors',
+    },
+    {
+        'query': '_collections:Data',
+        'name': 'Data',
+    },
+    {
+        'query': '_collections:Conferences',
+        'name': 'Conferences',
+    },
+    {
+        'query': '_collections:Jobs',
+        'name': 'Jobs',
+    },
+    {
+        'query': '_collections:Institutions',
+        'name': 'Institutions',
+    },
+    {
+        'query': '_collections:Experiments',
+        'name': 'Experiments',
+    },
+    {
+        'query': '_collections:Journals',
+        'name': 'Journals',
+    },
+    {
+        'query': '_collections:"BABAR Analysis Documents"',
+        'name': 'BABAR Analysis Documents',
+    },
+    {
+        'query': '_collections:"BABAR Internal BAIS"',
+        'name': 'BABAR Internal BAIS',
+    },
+    {
+        'query': '_collections:"BABAR Internal Notes"',
+        'name': 'BABAR Internal Notes',
+    },
+    {
+        'query': '_collections:"CDF Internal Notes"',
+        'name': 'CDF Internal Notes',
+    },
+    {
+        'query': '_collections:"CDF Notes"',
+        'name': 'CDF Notes',
+    },
+    {
+        'query': '_collections:"CDS Hidden"',
+        'name': 'CDS Hidden',
+    },
+    {
+        'query': '_collections:"D0 Internal Notes"',
+        'name': 'D0 Internal Notes',
+    },
+    {
+        'query': '_collections:"D0 Preliminary Notes"',
+        'name': 'D0 Preliminary Notes',
+    },
+    {
+        'query': '_collections:"H1 Internal Notes"',
+        'name': 'H1 Internal Notes',
+    },
+    {
+        'query': '_collections:"H1 Preliminary Notes"',
+        'name': 'H1 Preliminary Notes',
+    },
+    {
+        'query': '_collections:"HAL Hidden"',
+        'name': 'HAL Hidden',
+    },
+    {
+        'query': '_collections:"HEP Hidden"',
+        'name': 'HEP Hidden',
+    },
+    {
+        'query': '_collections:"HERMES Internal Notes"',
+        'name': 'HERMES Internal Notes',
+    },
+    {
+        'query': '_collections:"LArSoft Internal Notes"',
+        'name': 'LArSoft Internal Notes',
+    },
+    {
+        'query': '_collections:"LArSoft Notes"',
+        'name': 'LArSoft Notes',
+    },
+    {
+        'query': '_collections:"ZEUS Internal Notes"',
+        'name': 'ZEUS Internal Notes',
+    },
+    {
+        'query': '_collections:"ZEUS Preliminary Notes"',
+        'name': 'ZEUS Preliminary Notes',
+    },
+]
+
 # Search
 # ======
 
@@ -238,6 +342,7 @@ INSPIRE_ENDPOINT_TO_INDEX = {
     'journals': 'records-journals',
     'literature': 'records-hep',
 }
+
 
 # Records
 # =======
@@ -687,6 +792,7 @@ JOURNALS_DB_REST_ENDPOINT = {
     'update_permission_factory_imp': "inspirehep.modules.records.permissions:record_update_permission_factory",
 }
 
+
 RECORDS_REST_ENDPOINTS = {
     'literature': LITERATURE_REST_ENDPOINT,
     'literature_references': LITERATURE_REFERENCES_REST_ENDPOINT,
@@ -1109,6 +1215,7 @@ MAGPIE_API_URL = None  # e.g. "http://magpie.inspirehep.net/api"
 LEGACY_BASE_URL = "http://inspirehep.net"
 LEGACY_RECORD_URL_PATTERN = 'http://inspirehep.net/record/{recid}'
 
+
 # Harvesting and Workflows
 # ========================
 ARXIV_PDF_URL = "http://export.arxiv.org/pdf/{arxiv_id}"
@@ -1479,6 +1586,7 @@ ARXIV_TO_INSPIRE_CATEGORY_MAPPING = {
     "stat.OT": "Other",
     "stat.TH": "Other"
 }
+
 
 # Configuration for the $ref updater
 # ==================================
