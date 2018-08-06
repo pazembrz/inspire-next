@@ -72,7 +72,7 @@ def _preprocess_result(result, from_db=None):
     if from_db:
         """If it is an db object then get citations from db
         Otherwise if it is from ES it has citations already in json"""
-        result['metadata']['citation_count'] = _get_citations_count(original_record)
+        result['metadata']['citation_count'] = _get_citations_count(from_db)
     record = result['metadata']
 
     ui_metadata = _get_ui_metadata(record)

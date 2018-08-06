@@ -36,7 +36,6 @@ from invenio_records_rest.facets import range_filter, terms_filter
 
 from inspire_matcher.config import MATCHER_DEFAULT_CONFIGURATION as exact_match
 
-
 # Debug
 # =====
 DEBUG_TB_INTERCEPT_REDIRECTS = False
@@ -342,7 +341,6 @@ INSPIRE_ENDPOINT_TO_INDEX = {
     'journals': 'records-journals',
     'literature': 'records-hep',
 }
-
 
 # Records
 # =======
@@ -792,7 +790,6 @@ JOURNALS_DB_REST_ENDPOINT = {
     'update_permission_factory_imp': "inspirehep.modules.records.permissions:record_update_permission_factory",
 }
 
-
 RECORDS_REST_ENDPOINTS = {
     'literature': LITERATURE_REST_ENDPOINT,
     'literature_references': LITERATURE_REFERENCES_REST_ENDPOINT,
@@ -1215,7 +1212,6 @@ MAGPIE_API_URL = None  # e.g. "http://magpie.inspirehep.net/api"
 LEGACY_BASE_URL = "http://inspirehep.net"
 LEGACY_RECORD_URL_PATTERN = 'http://inspirehep.net/record/{recid}'
 
-
 # Harvesting and Workflows
 # ========================
 ARXIV_PDF_URL = "http://export.arxiv.org/pdf/{arxiv_id}"
@@ -1586,7 +1582,6 @@ ARXIV_TO_INSPIRE_CATEGORY_MAPPING = {
     "stat.OT": "Other",
     "stat.TH": "Other"
 }
-
 
 # Configuration for the $ref updater
 # ==================================
