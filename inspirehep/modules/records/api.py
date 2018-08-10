@@ -49,13 +49,12 @@ from inspirehep.utils.record_getter import (
     RecordGetterError,
     get_es_record_by_uuid
 )
-
+from sqlalchemy import func
 
 MAX_UNIQUE_KEY_COUNT = 50000
 
 
 class InspireRecord(Record):
-
     """Record class that fetches records from DataBase."""
 
     @classmethod
@@ -259,12 +258,12 @@ class InspireRecord(Record):
         return inspire_recid_minter(id_, data)
 
     def add_document_or_figure(
-        self,
-        metadata,
-        stream=None,
-        is_document=True,
-        file_name=None,
-        key=None,
+            self,
+            metadata,
+            stream=None,
+            is_document=True,
+            file_name=None,
+            key=None,
     ):
         """Add a document or figure to the record.
 
@@ -319,10 +318,10 @@ class InspireRecord(Record):
         return metadata
 
     def _resolve_doc_or_fig_url(
-        self,
-        doc_or_fig_obj,
-        src_records=(),
-        only_new=False,
+            self,
+            doc_or_fig_obj,
+            src_records=(),
+            only_new=False,
     ):
         """Resolves the given document url according to the current record.
 
@@ -355,22 +354,22 @@ class InspireRecord(Record):
         )
 
         def _should_take_from_src_records(
-            self,
-            key,
-            src_record_file,
-            only_new,
+                self,
+                key,
+                src_record_file,
+                only_new,
         ):
             should_take = False
             if (
-                not only_new and
-                src_record_file
+                    not only_new and
+                    src_record_file
             ):
                 should_take = True
 
             elif (
-                only_new and
-                src_record_file and
-                key not in self.files
+                    only_new and
+                    src_record_file and
+                    key not in self.files
             ):
                 should_take = True
 
@@ -378,19 +377,19 @@ class InspireRecord(Record):
 
         def _already_there(self, only_new):
             return (
-                only_new and
-                key in self.files
+                    only_new and
+                    key in self.files
             )
 
         def _is_internal_document(doc_or_fig_obj):
             return doc_or_fig_obj['url'].startswith('/api/files/')
 
         def _get_meaningful_exception(
-            self,
-            key,
-            src_record_file,
-            only_new,
-            doc_or_fig_obj,
+                self,
+                key,
+                src_record_file,
+                only_new,
+                doc_or_fig_obj,
         ):
             exception = None
             if not src_record_file and key not in self.files:
@@ -433,11 +432,11 @@ class InspireRecord(Record):
         )
 
     def _download_to_docs_or_figs(
-        self,
-        document=None,
-        figure=None,
-        src_records=(),
-        only_new=False,
+            self,
+            document=None,
+            figure=None,
+            src_records=(),
+            only_new=False,
     ):
         if not document and not figure:
             raise TypeError(
@@ -586,9 +585,18 @@ class InspireRecord(Record):
 
         return new_key
 
+    def _get_citations_count(self):
+        """Returns citations count for this record"""
+        count = 0
+        with db.session.begin_nested():
+            count = db.session.query(func.count_citations("%d" % self.id)).first()
+            if not count:
+                raise Exception("DB did not returned any data for citations!")
+            count = int(count[0])
+        return count
+
 
 class ESRecord(InspireRecord):
-
     """Record class that fetches records from ElasticSearch."""
 
     @classmethod

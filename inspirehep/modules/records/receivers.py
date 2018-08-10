@@ -182,6 +182,14 @@ def enhance_after_index(sender, json, *args, **kwargs):
     populate_inspire_document_type(sender, json, *args, **kwargs)
     populate_name_variations(sender, json, *args, **kwargs)
     populate_title_suggest(sender, json, *args, **kwargs)
+    populate_citations_count(sender, json, *args, **kwargs)
+
+
+def populate_citations_count(sender, json, *args, **kwargs):
+    """Populate citations_count in ES from postgres function count_citations"""
+    citation_count=sender._get_citations_count()
+    json.update({'citation_count':citation_count})
+
 
 
 def populate_bookautocomplete(sender, json, *args, **kwargs):

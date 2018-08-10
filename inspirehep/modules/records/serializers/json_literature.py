@@ -59,7 +59,20 @@ def _get_ui_metadata(record):
     return display
 
 
-def _preprocess_result(result):
+def _get_citations_count(original_record):
+    """ Try to get citations"""
+    if hasattr(original_record, '_get_citations_count'):
+        """Call it only when it has this method"""
+        return original_record._get_citations_count()
+    return None
+
+
+def _preprocess_result(result, from_db=None):
+    """Add additional fields to output json"""
+    if from_db:
+        """If it is an db object then get citations from db
+        Otherwise if it is from ES it has citations already in json"""
+        result['metadata']['citation_count'] = _get_citations_count(original_record)
     record = result['metadata']
 
     ui_metadata = _get_ui_metadata(record)
@@ -77,11 +90,11 @@ class LiteratureJSONUISerializer(JSONSerializer):
         result = super(LiteratureJSONUISerializer, self).preprocess_record(
             pid, record, links_factory=links_factory, **kwargs
         )
-        return _preprocess_result(result)
+        return _preprocess_result(result, record)
 
     def preprocess_search_hit(self, pid, record_hit, links_factory=None,
                               **kwargs):
-        result = super(LiteratureJSONUISerializer, self).\
+        result = super(LiteratureJSONUISerializer, self). \
             preprocess_search_hit(pid, record_hit,
                                   links_factory=links_factory, **kwargs)
         return _preprocess_result(result)

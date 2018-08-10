@@ -39,7 +39,7 @@ def upgrade():
     ''')
 
     op.execute('''
-        create or replace function count_ciatations(ids text) returns bigint as $$
+        create or replace function count_citations(ids text) returns bigint as $$
         select count(id) as citations_count from records_metadata
             where referenced_records(json) @> ARRAY[ids]; $$
         language sql IMMUTABLE
