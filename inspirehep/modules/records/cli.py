@@ -471,8 +471,6 @@ def find_citations_inconsistencies(from_page, to_page, pagesize, output):
     ok = 0
     fail = 0
     no_cits = 0
-    more_in_es = 0
-    more_in_db = 0
     deleted = 0
 
     all_recs = int(PersistentIdentifier.query.filter(
@@ -484,8 +482,10 @@ def find_citations_inconsistencies(from_page, to_page, pagesize, output):
         all_recs -= int((from_page - 1) * pagesize)
     with click.progressbar(length=all_recs,
                            label="Processing %s records..." % all_recs) as bar:
+        _prepare_logdir(output)
         with open(output, 'w') as data_file:
-            keys = ['pid_value', 'db_citations_count', 'es_citations_count']
+            keys = ['pid_value', 'db_citations_count',
+                    'es_citations_count', 'es_citations_field']
             out_data = csv.DictWriter(data_file, keys)
             out_data.writeheader()
             _query = _gen_query(
@@ -500,9 +500,17 @@ def find_citations_inconsistencies(from_page, to_page, pagesize, output):
                     ok += 1
                     deleted += 1
                     continue
-                es_cits = get_citations_from_es(rec).total
-                db_cits = rec.get_citations_count()
-                if es_cits == db_cits:
+
+                try:
+                    es_cits = get_citations_from_es(rec).total
+                    es_citation_count_field = get_es_record('lit', pid.pid_value).get('citation_count')
+                    db_cits = rec.get_citations_count()
+                except Exception as err:
+                    click.echo("Cannot prepare data for %s record. %s", pid.pid_value, err)
+                    fail += 1
+                    continue
+
+                if es_cits == db_cits == es_citation_count_field:
                     if es_cits == 0:
                         no_cits += 1
                     ok += 1
@@ -510,26 +518,19 @@ def find_citations_inconsistencies(from_page, to_page, pagesize, output):
                     fail += 1
                     data = {'pid_value': pid.pid_value,
                             'db_citations_count': db_cits,
-                            'es_citations_count': es_cits}
-                    out_data.writerows(data)
+                            'es_citations_count': es_cits,
+                            'es_citations_field': es_citation_count_field}
+                    out_data.writerow(data)
                     data_file.flush()
-                    if es_cits > db_cits:
-                        more_in_es += 1
-                    else:
-                        more_in_db += 1
                 bar.update(1)
             output_msg = "\nProcessed {all_recs} records. {ok} were ok, {failed}"\
                          " had difference between db an es ctations count!"\
-                         " {biger_es} records had more citations in es."\
-                         " {biger_db} recpords had more citations in db."\
-                         " {no_citations} records had no citations"\
-                         " at all. {deleted} records"\
-                         " were deleted".format(all_recs=all_recs,
+                         "\n{no_citations} records had no citations"\
+                         " at all.\n{deleted} records"\
+                         " were deleted\n".format(all_recs=all_recs,
                                                 ok=ok, failed=fail,
-                                                biger_es=more_in_es,
-                                                biger_db=more_in_db,
                                                 no_citations=no_cits,
                                                 deleted=deleted)
             click.echo(output_msg)
-            data_file.writelines([output_msg, ])
-            click.echo("This data and additional info was saved in %s file" % output)
+            click.echo("Additional statistics for incosistent records"\
+                       "was saved in %s file" % output)
