@@ -33,6 +33,8 @@ import pprint
 from os import path, makedirs
 from datetime import datetime
 
+from multiprocessing.pool import mapstar, RUN, ThreadPool, IMapUnorderedIterator, Pool
+
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
@@ -43,10 +45,11 @@ from invenio_records_files.models import RecordsBuckets
 from inspirehep.modules.records.utils import get_citations_from_es
 from inspirehep.utils.record_getter import get_db_record, get_es_record, \
     RecordGetterError
-from .checkers import check_unlinked_references
-from .tasks import batch_reindex
+from inspirehep.modules.records.checkers import check_unlinked_references
+from inspirehep.modules.records.tasks import batch_reindex
 
 from invenio_records.models import RecordMetadata
+
 
 from sqlalchemy import (
     String,
@@ -404,8 +407,8 @@ def check_missing_records_in_es(data_output):
 
 
 @check.command()
-@click.option('-s', '--from-page', default=1)
-@click.option('-e', '--to-page', default='-1')
+@click.option('-f', '--from-page', default=1)
+@click.option('-t', '--to-page', default=-1)
 @click.option('-s', '--pagesize', default=100)
 @click.option('-o', '--data-output', default='/tmp/inspire/db_benchmark.csv')
 @with_appcontext
@@ -459,13 +462,72 @@ def benchmark_citations(from_page, to_page, pagesize, data_output):
                 out.writerows(tmp_data)
 
 
+class MyThreadPool(ThreadPool):
+    def imap_unordered(self, func, iterable, second_argument, chunksize=1):
+        '''
+        Like `imap()` method but ordering of results is arbitrary
+        '''
+        assert self._state == RUN
+        if chunksize == 1:
+            result = IMapUnorderedIterator(self._cache)
+            self._taskqueue.put((((result._job, i, func, (x, second_argument), {})
+                                for i, x in enumerate(iterable)), result._set_length))
+            return result
+        else:
+            assert chunksize > 1
+            task_batches = Pool._get_tasks(func, iterable, chunksize)
+            result = IMapUnorderedIterator(self._cache)
+            self._taskqueue.put((((result._job, i, mapstar, (x, second_argument), {})
+                                for i, x in enumerate(task_batches)), result._set_length))
+            return (item for chunk in result for item in chunk)
+
+
+def _process_record(pid, app):
+    with app.app_context():
+        success = False
+        deleted = False
+        no_cits = False
+        db_cits = None
+        es_cits = None
+        es_citation_count_field = None
+        data = {}
+        rec = get_db_record('lit', pid.pid_value)
+        if rec.get('deleted'):
+            success = True
+            deleted = True
+
+        if not deleted:
+            try:
+                es_cits = get_citations_from_es(rec).total
+                es_citation_count_field = get_es_record('lit',
+                                                        pid.pid_value).get(
+                    'citation_count')
+                db_cits = rec.get_citations_count()
+            except Exception as err:
+                click.echo("Cannot prepare data for %s record. %s",
+                           pid.pid_value,
+                           err)
+
+        if not deleted and es_cits is not None and es_cits == db_cits == es_citation_count_field:
+            if es_cits == 0:
+                no_cits = True
+            success = True
+        else:
+            data = {'pid_value': pid.pid_value,
+                    'db_citations_count': db_cits,
+                    'es_citations_count': es_cits,
+                    'es_citations_field': es_citation_count_field}
+        return (success, deleted, no_cits, data)
+
+
 @check.command()
-@click.option('-s', '--from-page', default=1)
-@click.option('-e', '--to-page', default='-1')
+@click.option('-f', '--from-page', default=1)
+@click.option('-t', '--to-page', default=-1)
 @click.option('-s', '--pagesize', default=100)
 @click.option('-o', '--output', default='/tmp/inspire/citations_inconsistencies.txt')
+@click.option('-p', '--pool-size', default=10)
 @with_appcontext
-def find_citations_inconsistencies(from_page, to_page, pagesize, output):
+def find_citations_inconsistencies(from_page, to_page, pagesize, output, pool_size):
     """Process all non deleted records and check if citation in ES
     are the same like in DB"""
     ok = 0
@@ -494,43 +556,31 @@ def find_citations_inconsistencies(from_page, to_page, pagesize, output):
                 to_page,
                 pagesize
             )
-            for pid in _query:
-                rec = get_db_record('lit', pid.pid_value)
-                if rec.get('deleted'):
+            _threads_pool = MyThreadPool(pool_size)
+            _threads = _threads_pool.imap_unordered(_process_record, _query, current_app._get_current_object(), )
+
+            for _thread in _threads:
+                success, record_deleted, no_cits, data = _thread
+                bar.update(1)
+                if success:
                     ok += 1
-                    deleted += 1
-                    continue
-
-                try:
-                    es_cits = get_citations_from_es(rec).total
-                    es_citation_count_field = get_es_record('lit', pid.pid_value).get('citation_count')
-                    db_cits = rec.get_citations_count()
-                except Exception as err:
-                    click.echo("Cannot prepare data for %s record. %s", pid.pid_value, err)
-                    fail += 1
-                    continue
-
-                if es_cits == db_cits == es_citation_count_field:
-                    if es_cits == 0:
+                    if record_deleted:
+                        deleted += 1
+                    elif no_cits:
                         no_cits += 1
-                    ok += 1
                 else:
                     fail += 1
-                    data = {'pid_value': pid.pid_value,
-                            'db_citations_count': db_cits,
-                            'es_citations_count': es_cits,
-                            'es_citations_field': es_citation_count_field}
                     out_data.writerow(data)
                     data_file.flush()
-                bar.update(1)
+
             output_msg = "\nProcessed {all_recs} records. {ok} were ok, {failed}"\
                          " had difference between db an es ctations count!"\
                          "\n{no_citations} records had no citations"\
                          " at all.\n{deleted} records"\
                          " were deleted\n".format(all_recs=all_recs,
-                                                ok=ok, failed=fail,
-                                                no_citations=no_cits,
-                                                deleted=deleted)
+                                                  ok=ok, failed=fail,
+                                                  no_citations=no_cits,
+                                                  deleted=deleted)
             click.echo(output_msg)
-            click.echo("Additional statistics for incosistent records"\
+            click.echo("Additional statistics for incosistent records"
                        "was saved in %s file" % output)
