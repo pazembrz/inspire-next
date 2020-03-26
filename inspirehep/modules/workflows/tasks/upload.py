@@ -24,6 +24,8 @@
 
 from __future__ import absolute_import, division, print_function
 
+import json
+
 import requests
 from flask import current_app
 from invenio_workflows.errors import WorkflowsError
@@ -40,6 +42,7 @@ from inspirehep.modules.workflows.utils import (
     get_source_for_root,
     with_debug_logging,
 )
+from inspirehep.utils.record_getter import get_record_from_hep
 from inspirehep.utils.schema import ensure_valid_schema
 
 
@@ -219,9 +222,9 @@ def _is_stale_data(workflow_object):
         return False
 
     head_uuid = workflow_object.extra_data.get('head_uuid')
-    record = InspireRecord.get_record(head_uuid)
+    record = get_record_from_hep(uuid=head_uuid)
 
-    if record.model.version_id != head_version_id:
+    if record.version_id != head_version_id:
         workflow_object.log.info(
             'Working with stale data:',
             'Expecting version %d but found %d' % (

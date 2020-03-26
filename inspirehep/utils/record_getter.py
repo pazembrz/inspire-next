@@ -26,6 +26,7 @@ from __future__ import absolute_import, division, print_function
 
 from functools import wraps
 
+import requests
 from flask import current_app
 from sqlalchemy import tuple_
 from werkzeug.utils import import_string
@@ -102,6 +103,50 @@ def get_es_record_by_uuid(uuid):
     search_class = import_string(search_conf['search_class'])()
 
     return search_class.get_source(uuid)
+
+
+@raise_record_getter_error_and_log
+def get_record_from_hep(pid_type=None, recid=None, uuid=None):
+    if (not pid_type and not recid) and not uuid:
+        raise RecordGetterError("No record pid or uuid provided")
+
+    from inspirehep.modules.records.api import InspireRecord
+    headers = {
+        "content-type": "application/json",
+        "Authorization": "Bearer {token}".format(
+            token=current_app.config['AUTHENTICATION_TOKEN']
+        ),
+    }
+    inspirehep_url = current_app.config.get("INSPIREHEP_URL")
+    if pid_type and recid:
+        response = requests.get(
+            "{inspirehep_url}{endpoint}/{control_number}".format(
+                inspirehep_url=inspirehep_url,
+                endpoint=current_app.config["PID_TYPES_TO_ENDPOINTS"][pid_type],
+                control_number=recid
+            ),
+            headers=headers,
+        )
+    else:
+        response = requests.get(
+            "{inspirehep_url}by_uuid/{uuid}".format(
+                inspirehep_url=inspirehep_url,
+                uuid=uuid
+            ),
+            headers=headers,
+        )
+
+    if response.status_code == 200 and response.json():
+        response_data = response.json()
+        record_data = response_data.get('metadata')
+        uuid = response_data['uuid']
+        if not record_data:
+            raise RecordGetterError("Record is empty", "No record")
+        record = InspireRecord(record_data, uuid)
+        return record
+    else:
+        raise RecordGetterError("Cannot download record from hep", response.reason or response.text)
+
 
 
 @raise_record_getter_error_and_log

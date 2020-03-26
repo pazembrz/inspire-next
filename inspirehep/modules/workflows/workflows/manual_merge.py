@@ -31,7 +31,7 @@ from inspirehep.modules.workflows.tasks.manual_merging import (
     save_roots,
     store_records,
 )
-from inspirehep.utils.record_getter import get_db_record
+from inspirehep.utils.record_getter import get_record_from_hep
 
 
 class ManualMerge(object):
@@ -65,8 +65,8 @@ def start_merger(head_id, update_id, current_user_id=None):
         'recid_update': update_id,
     }
 
-    head = get_db_record('lit', head_id)
-    update = get_db_record('lit', update_id)
+    head = get_record_from_hep('lit', head_id)
+    update = get_record_from_hep('lit', update_id)
 
     workflow_object = workflow_object_class.create(
         data=None,

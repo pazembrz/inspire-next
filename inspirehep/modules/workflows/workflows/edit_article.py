@@ -32,7 +32,7 @@ from inspirehep.modules.workflows.tasks.actions import validate_record
 from inspirehep.modules.workflows.tasks.submission import cleanup_pending_workflow, send_robotupload
 from inspirehep.modules.workflows.tasks.upload import send_record_to_hep
 from inspirehep.modules.workflows.utils import get_resolve_edit_article_callback_url
-from inspirehep.utils.record_getter import get_db_record
+from inspirehep.utils.record_getter import get_record_from_hep
 from ..utils import with_debug_logging
 
 
@@ -48,7 +48,7 @@ def update_record(obj, eng):
         endpoint = '/literature'
         send_record_to_hep(obj, endpoint, control_number)
     else:
-        record = get_db_record('lit', control_number)
+        record = get_record_from_hep('lit', control_number)
         record.update(obj.data)
         record.commit()
 
@@ -60,7 +60,7 @@ def update_record(obj, eng):
 
 
 def _set_transaction_user_id_for_last_record_update(control_number, user_id):
-    record = get_db_record('lit', control_number)
+    record = get_record_from_hep('lit', control_number)
     revision = record.model.versions.filter_by(version_id=(record.revision_id + 1)).one()
     transaction_id = revision.transaction_id
 

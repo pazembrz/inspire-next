@@ -1690,3 +1690,16 @@ FUZZY_MATCH = {
 APPMETRICS_ELASTICSEARCH_HOSTS = ['localhost']
 APPMETRICS_ELASTICSEARCH_INDEX = 'inspireappmetrics-dev'
 APPMETRICS_THREADED_BACKEND = True
+
+
+# record helper
+PID_TYPES_TO_ENDPOINTS = {
+    "lit": "literature",
+    "aut": "authors",
+    "job": "jobs",
+    "jou": "journals",
+    "exp": "experiments",
+    "con": "conferences",
+    "dat": "data",
+    "ins": "institutions",
+}

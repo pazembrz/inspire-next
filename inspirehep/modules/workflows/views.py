@@ -70,7 +70,7 @@ from inspirehep.modules.workflows.utils import (
     get_resolve_validation_callback_url,
     get_validation_errors,
 )
-from inspirehep.utils.record_getter import get_db_record, RecordGetterError
+from inspirehep.utils.record_getter import get_record_from_hep, RecordGetterError
 from inspirehep.utils.tickets import get_rt_link_for_ticket
 
 callback_blueprint = Blueprint(
@@ -660,7 +660,7 @@ class ResolveEditArticleResource(MethodView):
 
         recid = workflow_data['metadata'].get('control_number')
         try:
-            record = get_db_record('lit', recid)
+            record = get_record_from_hep('lit', recid)
         except RecordGetterError:
             raise CallbackRecordNotFoundError(recid)
 
@@ -686,7 +686,7 @@ class ResolveEditArticleResource(MethodView):
 
 def start_edit_article_workflow(recid):
     try:
-        record = get_db_record('lit', recid)
+        record = get_record_from_hep('lit', recid)
     except RecordGetterError:
         raise CallbackRecordNotFoundError(recid)
 
@@ -721,7 +721,7 @@ def inspect_merge(holdingpen_id):
 
     root = wf.extra_data.get('merger_original_root')
     update = wf.extra_data['merger_root']
-    merged = get_db_record('lit', wf.data['control_number'])
+    merged = get_record_from_hep('lit', wf.data['control_number'])
     # XXX merged.revisions[revision_id] should work if not for the messed up
     # non-consecutive versions in prod
     head = merged.model.versions.filter_by(version_id=(revision_id + 1)).one().json

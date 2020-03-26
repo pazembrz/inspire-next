@@ -44,7 +44,7 @@ class CeleryTask(AppContextTask):
         if isinstance(exc, (InvalidRequestError, OperationalError, Psycopg2OperationalError)):
             LOGGER.exception('Shutting down celery process because of'.format(exc))
             try:
-                with open('/dev/termination-log', 'w') as term_log:
+                with open('termination-log', 'w') as term_log:
                     term_log.write(str(exc))
             finally:
                 os.kill(os.getppid(), signal.SIGTERM)

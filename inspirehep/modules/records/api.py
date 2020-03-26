@@ -64,6 +64,24 @@ class referenced_records(GenericFunction):
 class InspireRecord(Record):
     """Record class that fetches records from DataBase."""
 
+    def __init__(self, data, uuid, *args, **kwargs):
+        self._id = uuid
+        self._version_id = data.pop("version_id")
+        self._revision_id = data.pop("revision_id")
+        super(Record, self).__init__(data, *args, **kwargs)
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def version_id(self):
+        return self._version_id
+
+    @property
+    def revision_id(self):
+        return self._revision_id
+
     @classmethod
     def create(cls, data, id_=None, **kwargs):
         """Override the default ``create``.
@@ -224,19 +242,21 @@ class InspireRecord(Record):
     def delete(self):
         """Mark as deleted all pidstores for a specific record."""
 
-        pids = PersistentIdentifier.query.filter(
-            PersistentIdentifier.object_uuid == self.id
-        ).all()
-
-        with db.session.begin_nested():
-            for pid in pids:
-                pid.delete()
-                db.session.add(pid)
-
-        self['deleted'] = True
+        raise NotImplementedError
+        # pids = PersistentIdentifier.query.filter(
+        #     PersistentIdentifier.object_uuid == self.id
+        # ).all()
+        #
+        # with db.session.begin_nested():
+        #     for pid in pids:
+        #         pid.delete()
+        #         db.session.add(pid)
+        #
+        # self['deleted'] = True
 
     def _delete(self, *args, **kwargs):
-        super(InspireRecord, self).delete(*args, **kwargs)
+        raise NotImplementedError
+        # super(InspireRecord, self).delete(*args, **kwargs)
 
     def _create_bucket(self, location=None, storage_class=None):
         """Create file bucket for workflow object."""
@@ -262,7 +282,9 @@ class InspireRecord(Record):
     @staticmethod
     def mint(id_, data):
         """Mint the record."""
-        return inspire_recid_minter(id_, data)
+
+        raise  NotImplementedError
+        # return inspire_recid_minter(id_, data)
 
     def add_document_or_figure(
         self,
@@ -611,39 +633,42 @@ class InspireRecord(Record):
 
     def _query_citing_records(self, show_duplicates=False):
         """Returns records which cites this one."""
-        index_ref = self._get_index_ref()
-        if not index_ref:
-            raise Exception("There is no index_ref for this object")
-        citation_query = RecordMetadata.query.with_entities(RecordMetadata.id,
-                                                            RecordMetadata.json['control_number'])
-        citation_filter = referenced_records(RecordMetadata.json).contains([index_ref])
-        filter_deleted_records = or_(not_(type_coerce(RecordMetadata.json, JSONB).has_key('deleted')),  # noqa: W601
-                                     not_(RecordMetadata.json['deleted'] == cast(True, JSONB)))
-        only_literature_collection = type_coerce(RecordMetadata.json, JSONB)['_collections'].contains(['Literature'])
-        filter_superseded_records = or_(
-            not_(type_coerce(RecordMetadata.json, JSONB).has_key('related_records')),  # noqa: W601
-            not_(type_coerce(RecordMetadata.json, JSONB)['related_records'].contains([{'relation': 'successor'}]))
-        )
-        citations = citation_query.filter(citation_filter,
-                                          filter_deleted_records,
-                                          filter_superseded_records,
-                                          only_literature_collection)
-        if not show_duplicates:
-            # It just hides duplicates, and still can show citations
-            # which do not have proper PID in PID store
-            # Duplicated data should be removed with the CLI command
-            citations = citations.distinct(RecordMetadata.json['control_number'])
-        return citations
+        raise  NotImplementedError
+        # index_ref = self._get_index_ref()
+        # if not index_ref:
+        #     raise Exception("There is no index_ref for this object")
+        # citation_query = RecordMetadata.query.with_entities(RecordMetadata.id,
+        #                                                     RecordMetadata.json['control_number'])
+        # citation_filter = referenced_records(RecordMetadata.json).contains([index_ref])
+        # filter_deleted_records = or_(not_(type_coerce(RecordMetadata.json, JSONB).has_key('deleted')),  # noqa: W601
+        #                              not_(RecordMetadata.json['deleted'] == cast(True, JSONB)))
+        # only_literature_collection = type_coerce(RecordMetadata.json, JSONB)['_collections'].contains(['Literature'])
+        # filter_superseded_records = or_(
+        #     not_(type_coerce(RecordMetadata.json, JSONB).has_key('related_records')),  # noqa: W601
+        #     not_(type_coerce(RecordMetadata.json, JSONB)['related_records'].contains([{'relation': 'successor'}]))
+        # )
+        # citations = citation_query.filter(citation_filter,
+        #                                   filter_deleted_records,
+        #                                   filter_superseded_records,
+        #                                   only_literature_collection)
+        # if not show_duplicates:
+        #     # It just hides duplicates, and still can show citations
+        #     # which do not have proper PID in PID store
+        #     # Duplicated data should be removed with the CLI command
+        #     citations = citations.distinct(RecordMetadata.json['control_number'])
+        # return citations
 
     @property
     def get_citing_records_query(self):
-        return self._query_citing_records()
+        raise NotImplementedError
+        # return self._query_citing_records()
 
     def get_citations_count(self, show_duplicates=False):
         """Returns citations count for this record."""
 
-        count = self._query_citing_records(show_duplicates).count()
-        return count
+        raise  NotImplementedError
+        # count = self._query_citing_records(show_duplicates).count()
+        # return count
 
     def dumps(self):
         """Returns a dict 'representation' of the record.
@@ -681,28 +706,33 @@ class InspireRecord(Record):
             Set[Tuple[str, int]]: pids of references changed from the previous
             version.
         """
-        def _get_ids_from_refs(references):
-            return set([
-                get_pid_from_record_uri(ref['record']['$ref'])
-                for ref in references
-                if 'record' in ref
-            ])
 
-        try:
-            prev_version = self.model.versions.filter_by(
-                version_id=self.model.version_id).one().previous.json
-        except AttributeError:
-            prev_version = {}
-
-        changed_deleted_status = self.get('deleted', False) ^ prev_version.get('deleted', False)
-
-        if changed_deleted_status:
-            return _get_ids_from_refs(self.get('references', []))
-
-        ids_latest = _get_ids_from_refs(self.get('references', []))
-        ids_oldest = _get_ids_from_refs(prev_version.get('references', []))
-
-        return set.symmetric_difference(ids_latest, ids_oldest)
+        raise  NotImplementedError
+        # def _get_ids_from_refs(references):
+        #     return set([
+        #         get_pid_from_record_uri(ref['record']['$ref'])
+        #         for ref in references
+        #         if 'record' in ref
+        #     ])
+        #
+        # try:
+        #     prev_version = self.model.versions.filter_by(
+        #         version_id=self.model.version_id).one().previous.json
+        # except AttributeError:
+        #     prev_version = {}
+        #
+        # changed_deleted_status = self.get('deleted', False) ^ prev_version.get('deleted', False)
+        #
+        # if changed_deleted_status:
+        #     return _get_ids_from_refs(self.get('references', []))
+        #
+        # ids_latest = _get_ids_from_refs(self.get('references', []))
+        # ids_oldest = _get_ids_from_refs(prev_version.get('references', []))
+        #
+        # return set.symmetric_difference(ids_latest, ids_oldest)
+    def commit(self, *args, **kwargs):
+        db.session.rollback()
+        raise NotImplementedError
 
 
 class ESRecord(InspireRecord):
