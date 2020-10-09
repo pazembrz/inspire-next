@@ -24,10 +24,13 @@
 
 from __future__ import absolute_import, division, print_function
 
+from flask import current_app
 from invenio_db import db
 
 from inspire_dojson.utils import get_record_ref
 from inspire_json_merger.api import merge
+
+from inspirehep.modules.workflows.tasks.upload import _send_record_to_hep
 from inspirehep.modules.workflows.utils import (
     with_debug_logging,
     read_all_wf_record_sources
@@ -182,6 +185,10 @@ def store_records(obj, eng):
     update_ref = get_record_ref(update_control_number, 'literature')
     head.setdefault('deleted_records', []).append(update_ref)
 
-    head.commit()
-    update.commit()
-    db.session.commit()
+
+    if current_app.config.get("FEATURE_FLAG_ENABLE_REST_RECORD_MANAGEMENT"):
+        _send_record_to_hep(update.data, "/literature", control_number=head_control_number)
+    else:
+        head.commit()
+        update.commit()
+        db.session.commit()

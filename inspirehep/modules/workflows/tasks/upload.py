@@ -106,6 +106,22 @@ def store_record_inspirehep_api(obj, eng, is_update, is_authors):
 
 
 def send_record_to_hep(obj, endpoint, control_number=None):
+    response = _send_record_to_hep(obj.data, endpoint, control_number)
+    if control_number:
+        if response.status_code == 200:
+            obj.data['control_number'] = response.json()['metadata']['control_number']
+        else:
+            create_error(response)
+    else:
+        if response.status_code == 201:
+            obj.data['control_number'] = response.json()['metadata']['control_number']
+            obj.extra_data['head_uuid'] = response.json()['uuid']
+        else:
+            create_error(response)
+    with db.session.begin_nested():
+        obj.save()
+
+def _send_record_to_hep(data, endpoint, control_number=None):
     headers = {
         "content-type": "application/json",
         "Authorization": "Bearer {token}".format(
@@ -121,12 +137,8 @@ def send_record_to_hep(obj, endpoint, control_number=None):
                 control_number=control_number
             ),
             headers=headers,
-            json=obj.data
+            json=data
         )
-        if response.status_code == 200:
-            obj.data['control_number'] = response.json()['metadata']['control_number']
-        else:
-            create_error(response)
     else:
         response = requests.post(
             "{inspirehep_url}{endpoint}".format(
@@ -134,16 +146,9 @@ def send_record_to_hep(obj, endpoint, control_number=None):
                 endpoint=endpoint,
             ),
             headers=headers,
-            json=obj.data
+            json=data
         )
-
-        if response.status_code == 201:
-            obj.data['control_number'] = response.json()['metadata']['control_number']
-            obj.extra_data['head_uuid'] = response.json()['uuid']
-        else:
-            create_error(response)
-    with db.session.begin_nested():
-        obj.save()
+    return response
 
 
 def create_error(response):
