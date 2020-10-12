@@ -37,6 +37,7 @@ from inspirehep.modules.workflows.utils import (
 )
 from inspirehep.modules.workflows.models import WorkflowsRecordSources
 from inspirehep.utils.record_getter import get_db_record
+from invenio_workflows.errors import WorkflowsError
 
 
 @with_debug_logging
@@ -187,7 +188,13 @@ def store_records(obj, eng):
 
 
     if current_app.config.get("FEATURE_FLAG_ENABLE_REST_RECORD_MANAGEMENT"):
-        _send_record_to_hep(update.data, "/literature", control_number=head_control_number)
+        response = _send_record_to_hep(update.data, "/literature", control_number=head_control_number)
+        if response.status_code == 200:
+            return
+        elif response.status_code == 201:
+            raise WorkflowsError("Response 201 from Inspire. New record was created. This shouldn't happen!")
+        else:
+            WorkflowsError("Error from Inspire. {code}: {message}".format(response.status_code, response.json()))
     else:
         head.commit()
         update.commit()
