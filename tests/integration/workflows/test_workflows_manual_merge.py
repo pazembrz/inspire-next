@@ -43,7 +43,6 @@ from invenio_workflows.errors import WorkflowsError
 from mock import patch
 
 
-
 def fake_record(title, rec_id):
     return {
         '$schema': 'http://localhost:5000/schemas/records/hep.json',
@@ -58,7 +57,7 @@ def fake_record(title, rec_id):
 
 def test_manual_merge_existing_records(workflow_app):
     with patch.dict(workflow_app.config, {
-        'FEATURE_FLAG_ENABLE_REST_RECORD_MANAGEMENT': False,
+        'FEATURE_FLAG_ENABLE_MANUAL_MERGE_REST_RECORD_MANAGEMENT': False,
     }):
         json_head = fake_record('This is the HEAD', 1)
         json_update = fake_record('While this is the update', 2)
@@ -118,7 +117,7 @@ def test_manual_merge_existing_records(workflow_app):
 
 def test_manual_merge_with_none_record(workflow_app):
     with patch.dict(workflow_app.config, {
-        'FEATURE_FLAG_ENABLE_REST_RECORD_MANAGEMENT': False,
+        'FEATURE_FLAG_ENABLE_MANUAL_MERGE_REST_RECORD_MANAGEMENT': False,
     }):
         json_head = fake_record('This is the HEAD', 1)
 
@@ -136,7 +135,7 @@ def test_manual_merge_with_none_record(workflow_app):
 
 def test_save_roots(workflow_app):
     with patch.dict(workflow_app.config, {
-        'FEATURE_FLAG_ENABLE_REST_RECORD_MANAGEMENT': False,
+        'FEATURE_FLAG_ENABLE_MANUAL_MERGE_REST_RECORD_MANAGEMENT': False,
     }):
         head = InspireRecord.create_or_update(fake_record('title1', 123), skip_files=False)
         head.commit()
@@ -184,7 +183,7 @@ def test_store_record_inspirehep_api_manual_merge_accepts(workflow_app):
     update.commit()
 
     with patch.dict(workflow_app.config, {
-        'FEATURE_FLAG_ENABLE_REST_RECORD_MANAGEMENT': True,
+        'FEATURE_FLAG_ENABLE_MANUAL_MERGE_REST_RECORD_MANAGEMENT': True,
         'INSPIREHEP_URL': "http://web:8000"
     }):
         with requests_mock.Mocker() as requests_mocker:
@@ -226,7 +225,7 @@ def test_store_record_inspirehep_api_manual_merge_error_code(workflow_app):
     update.commit()
 
     with patch.dict(workflow_app.config, {
-        'FEATURE_FLAG_ENABLE_REST_RECORD_MANAGEMENT': True,
+        'FEATURE_FLAG_ENABLE_MANUAL_MERGE_REST_RECORD_MANAGEMENT': True,
         'INSPIREHEP_URL': "http://web:8000"
     }):
         with requests_mock.Mocker() as requests_mocker:
