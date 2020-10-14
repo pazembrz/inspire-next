@@ -23,6 +23,7 @@
 from __future__ import absolute_import, division, print_function
 
 import pytest
+import requests_mock
 
 from inspire_schemas.readers import LiteratureReader
 from invenio_workflows import ObjectStatus, workflow_object_class
@@ -40,6 +41,7 @@ from inspirehep.utils.record_getter import get_db_record, RecordGetterError
 from calls import do_resolve_manual_merge_wf
 from invenio_workflows.errors import WorkflowsError
 from mock import patch
+
 
 
 def fake_record(title, rec_id):
@@ -168,7 +170,7 @@ def test_save_roots(workflow_app):
         assert not read_wf_record_source(update.id, 'publisher')
 
 
-def test_store_record_inspirehep_api_manual_merge_accepts(workflow_app, requests_mock=None):
+def test_store_record_inspirehep_api_manual_merge_accepts(workflow_app):
     json_head = fake_record('This is the HEAD', 1)
     json_update = fake_record('While this is the update', 2)
 
@@ -210,7 +212,7 @@ def test_store_record_inspirehep_api_manual_merge_accepts(workflow_app, requests
         assert obj.extra_data['auto-approved'] is False
 
 
-def test_store_record_inspirehep_api_manual_merge_error_code(workflow_app, requests_mock=None):
+def test_store_record_inspirehep_api_manual_merge_error_code(workflow_app):
     json_head = fake_record('This is the HEAD', 1)
     json_update = fake_record('While this is the update', 2)
 
