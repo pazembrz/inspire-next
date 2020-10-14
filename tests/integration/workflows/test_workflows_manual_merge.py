@@ -22,8 +22,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-from test._mock_backport import patch
-
 import pytest
 
 from inspire_schemas.readers import LiteratureReader
@@ -41,6 +39,7 @@ from inspirehep.utils.record_getter import get_db_record, RecordGetterError
 
 from calls import do_resolve_manual_merge_wf
 from invenio_workflows.errors import WorkflowsError
+from mock import patch
 
 
 def fake_record(title, rec_id):
