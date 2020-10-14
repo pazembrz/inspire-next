@@ -22,7 +22,7 @@
 
 from __future__ import absolute_import, division, print_function
 
-from test._mock_backport import MagicMock, patch
+from test._mock_backport import patch
 
 import pytest
 
@@ -30,7 +30,7 @@ from inspire_schemas.readers import LiteratureReader
 from invenio_workflows import ObjectStatus, workflow_object_class
 from invenio_records.api import RecordMetadata
 
-from inspirehep.modules.workflows.tasks.manual_merging import save_roots, store_records
+from inspirehep.modules.workflows.tasks.manual_merging import save_roots
 from inspirehep.modules.workflows.utils import (
     insert_wf_record_source,
     read_wf_record_source,

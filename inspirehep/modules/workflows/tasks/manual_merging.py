@@ -186,7 +186,6 @@ def store_records(obj, eng):
     update_ref = get_record_ref(update_control_number, 'literature')
     head.setdefault('deleted_records', []).append(update_ref)
 
-
     if current_app.config.get("FEATURE_FLAG_ENABLE_REST_RECORD_MANAGEMENT"):
         response = _send_record_to_hep(update.data, "/literature", control_number=head_control_number)
         if response.status_code == 200:

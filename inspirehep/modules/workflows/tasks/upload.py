@@ -121,6 +121,7 @@ def send_record_to_hep(obj, endpoint, control_number=None):
     with db.session.begin_nested():
         obj.save()
 
+
 def _send_record_to_hep(data, endpoint, control_number=None):
     headers = {
         "content-type": "application/json",
