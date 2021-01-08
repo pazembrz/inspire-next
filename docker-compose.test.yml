@@ -72,7 +72,7 @@ services:
         - ".:/inspire-next"
 
   unit:
-    image: test-service_base
+    image: inspire-build/test-service_base
     command: bash -c "flake8 inspirehep tests && py.test tests/unit && make -C docs html"
 
   workflows:
@@ -87,7 +87,7 @@ services:
         condition: service_healthy
 
   integration:
-    image: test-service_base
+    image: inspire-build/test-service_base
     command: py.test tests/integration --ignore tests/integration/workflows
     depends_on:
       test-database:
@@ -98,7 +98,7 @@ services:
         condition: service_healthy
 
   integration_async:
-    image: test-service_base
+    image: inspire-build/test-service_base
     command: py.test tests/integration_async
     depends_on:
       test-database:
@@ -111,7 +111,7 @@ services:
          condition: service_healthy
 
   test-web:
-    image: test-service_base
+    image: inspire-build/test-service_base
     command: gunicorn -b 0.0.0.0:5000 -t 3600 -w 1 --access-logfile "-" inspirehep.wsgi_with_coverage:application
     volumes_from:
       - test-static
@@ -128,7 +128,7 @@ services:
       - APP_SERVER_NAME=test-web:5000
 
   test-worker:
-    image: test-service_base
+    image: inspire-build/test-service_base
     command: celery worker -E -A inspirehep.celery_tests --loglevel=INFO --purge --queues celery,migrator,harvests,orcid_push
     volumes_from:
       - test-static
