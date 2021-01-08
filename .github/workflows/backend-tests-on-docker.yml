@@ -31,7 +31,7 @@ jobs:
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
         with:
-          key: docker-cache-{github.sha}
+          key: docker-cache
       - name: Build images
         run: |
           docker-compose -f docker-compose.test.yml build test-service_base
@@ -48,7 +48,7 @@ jobs:
       - name: Cache images
         uses: satackey/action-docker-layer-caching@v0.0.11
         with:
-          key: docker-cache-{github.sha}
+          key: docker-cache
       - name: Prepare docker
         run: |
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-rabbitmq test-redis
@@ -71,7 +71,7 @@ jobs:
       - name: Cache images
         uses: satackey/action-docker-layer-caching@v0.0.11
         with:
-          key: docker-cache-{github.sha}
+          key: docker-cache
       - name: Prepare docker
         run: |
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-redis
@@ -93,7 +93,7 @@ jobs:
       - name: Cache images
         uses: satackey/action-docker-layer-caching@v0.0.11
         with:
-          key: docker-cache-{github.sha}
+          key: docker-cache
       - name: Prepare docker
         run: |
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-redis test-rabbitmq
@@ -115,7 +115,7 @@ jobs:
       - name: Cache images
         uses: satackey/action-docker-layer-caching@v0.0.11
         with:
-          key: docker-cache-{github.sha}
+          key: docker-cache
       - name: Run tests
         run: docker-compose -f docker-compose.test.yml run --rm unit
       - name: Stop docker
