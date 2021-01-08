@@ -1,0 +1,44 @@
+name: Build and release
+
+on:
+  push:
+    branches:
+      - add_github-actions
+      - master
+  pull_request:
+    branches:
+      - master
+
+#env:
+#  APP_SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://inspirehep:inspirehep@test-database:5432/inspirehep
+#  APP_CELERY_BROKER_URL: pyamqp://guest:guest@test-rabbitmq:5672//
+#  APP_CELERY_RESULT_BACKEND: redis://test-redis:6379/1
+#  APP_CACHE_REDIS_URL: redis://test-redis:6379/0
+#  APP_ACCOUNTS_SESSION_REDIS_URL: redis://test-redis:6379/2
+#  APP_SEARCH_ELASTIC_HOSTS: test-indexer
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 2.7
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Pull and Build images
+        run: |
+          - docker-compose -f docker-compose.test.yml pull --parallel workflows test-database test-indexer test-rabbitmq test-redis test-web
+          - docker-compose -f docker-compose.test.yml build --prarllel workflows test-database test-indexer test-rabbitmq test-redis test-web
+          - docker-compose -f docker-compose.test.yml up -d test-database test-indexer test-rabbitmq test-redis test-web
+          - sh docker/wait-for-services.sh
+      - name: Run tests
+        run: docker-compose -f docker-compose.test.yml run --rm workflows
+      - name: Stop docker
+        run: docker-compode down
+    
+

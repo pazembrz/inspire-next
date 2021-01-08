@@ -70,6 +70,10 @@ jobs:
         with:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
+      - name: Install additional apps
+        run: |
+          - apt update
+          - apt install ImageMagic
       - name: Install requirements
         run: poetry install -n -E all -E xrootd
       - name: Run tests
