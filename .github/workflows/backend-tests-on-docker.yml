@@ -1,4 +1,4 @@
-name: Build and release
+name: Build on docker
 
 on:
   push:
@@ -18,7 +18,7 @@ on:
 #  APP_SEARCH_ELASTIC_HOSTS: test-indexer
 
 jobs:
-  Test:
+  Build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,15 +30,94 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Pull and Build images
+      - name: pull images
+        run: docker-compose -f docker-compose.test.yml pull --parallel test-service_base
+      - name: Cache images
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+        with:
+          key: docker-cache-{github.sha}
+      - name: Build images
+        run: docker-compose -f docker-compose.test.yml build --parallel test-service_base
+
+  Workflows:
+    needs: Build
+    steps:
+      - name: Checkout
+          uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
+      - name: Cache images
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        with:
+          key: docker-cache-{github.sha}
+      - name: Prepare docker
         run: |
-          docker-compose -f docker-compose.test.yml pull --parallel workflows test-database test-indexer test-rabbitmq test-redis test-web
-          docker-compose -f docker-compose.test.yml build --parallel workflows test-database test-indexer test-rabbitmq test-redis test-web
+          docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-rabbitmq test-redis
+          docker-compose -f docker-compose.test.yml build --parallel workflows test-web
           docker-compose -f docker-compose.test.yml up -d test-database test-indexer test-rabbitmq test-redis test-web
           sh docker/wait-for-services.sh
       - name: Run tests
         run: docker-compose -f docker-compose.test.yml run --rm workflows
       - name: Stop docker
-        run: docker-compode down
+        run: docker-compose down
+
+  Integration:
+    needs: Build
+    steps:
+      - name: Checkout
+          uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
+      - name: Cache images
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        with:
+          key: docker-cache-{github.sha}
+      - name: Prepare docker
+        run: |
+          docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-redis
+          docker-compose -f docker-compose.test.yml up -d test-database test-indexer test-redis
+          sh docker/wait-for-services.sh
+      - name: Run tests
+        run: docker-compose -f docker-compose.test.yml run --rm integration
+      - name: Stop docker
+        run: docker-compose down
+
+  Integration-async:
+    needs: Build
+    steps:
+      - name: Checkout
+          uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
+      - name: Cache images
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        with:
+          key: docker-cache-{github.sha}
+      - name: Prepare docker
+        run: |
+          docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-redis test-rabbitmq
+          docker-compose -f docker-compose.test.yml up -d test-database test-indexer test-redis test-rabbitmq
+          sh docker/wait-for-services.sh
+      - name: Run tests
+        run: docker-compose -f docker-compose.test.yml run --rm integration_async
+      - name: Stop docker
+        run: docker-compose down
+
+  Unit:
+    needs: Build
+    steps:
+      - name: Checkout
+          uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
+      - name: Cache images
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        with:
+          key: docker-cache-{github.sha}
+      - name: Run tests
+        run: docker-compose -f docker-compose.test.yml run --rm unit
+      - name: Stop docker
+        run: docker-compose down
 
 
