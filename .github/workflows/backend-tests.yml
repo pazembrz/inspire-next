@@ -1,8 +1,7 @@
 name: Build and release
 
 on:
-  push:
-    branches: [*]
+  push
   pull_request:
     branches: [master]
 
@@ -19,8 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7]
-        suite: ["test-database test-indexer test-rabbitmq test-redis"]
+        python-version:
+          - 2.7
+        suite:
+          - "test-database test-indexer test-rabbitmq test-redis"]
     services:
       postgres:
         image: postgres:9.6
