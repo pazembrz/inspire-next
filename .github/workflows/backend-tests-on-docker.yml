@@ -33,7 +33,9 @@ jobs:
         with:
           key: docker-cache-{github.sha}
       - name: Build images
-        run: docker-compose -f docker-compose.test.yml build --parallel test-service_base
+        run: |
+          docker-compose -f docker-compose.test.yml build test-service_base
+          docker-compose -f docker-compose.test.yml build workflows integration integration-async unit
 
   Workflows:
     runs-on: ubuntu-latest
