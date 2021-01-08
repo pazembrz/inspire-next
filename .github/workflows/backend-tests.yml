@@ -68,7 +68,6 @@ jobs:
           path: ~/.cache/pypoetry/virtualenvs
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
       - name: Install requirements
-          shell: bash
-          run: poetry install
+        run: poetry install
       - name: Run tests
         run: py.test tests/integration/workflows
