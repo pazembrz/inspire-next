@@ -28,6 +28,7 @@ services:
     extends:
       file: services.yml
       service: base
+    image: inspire-build/test-service_base
     environment:
       - APP_SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://inspirehep:inspirehep@test-database:5432/inspirehep
       - APP_CELERY_BROKER_URL=pyamqp://guest:guest@test-rabbitmq:5672//
