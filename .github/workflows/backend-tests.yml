@@ -23,8 +23,6 @@ jobs:
       matrix:
         python-version:
           - 2.7
-        suite:
-          - "test-database test-indexer test-rabbitmq test-redis"
     services:
       postgres:
         image: postgres:9.6
