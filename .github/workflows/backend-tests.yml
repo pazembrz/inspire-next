@@ -2,8 +2,9 @@ name: Build and release
 
 on:
   push:
-    - add_github-actions
-    - master
+    branches:
+      - add_github-actions
+      - master
   pull_request:
     branches:
       - master
