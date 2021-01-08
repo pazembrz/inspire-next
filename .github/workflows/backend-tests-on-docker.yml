@@ -32,13 +32,13 @@ jobs:
           fetch-depth: 0
       - name: Pull and Build images
         run: |
-          - docker-compose -f docker-compose.test.yml pull --parallel workflows test-database test-indexer test-rabbitmq test-redis test-web
-          - docker-compose -f docker-compose.test.yml build --prarllel workflows test-database test-indexer test-rabbitmq test-redis test-web
-          - docker-compose -f docker-compose.test.yml up -d test-database test-indexer test-rabbitmq test-redis test-web
-          - sh docker/wait-for-services.sh
+          docker-compose -f docker-compose.test.yml pull --parallel workflows test-database test-indexer test-rabbitmq test-redis test-web
+          docker-compose -f docker-compose.test.yml build --prarllel workflows test-database test-indexer test-rabbitmq test-redis test-web
+          docker-compose -f docker-compose.test.yml up -d test-database test-indexer test-rabbitmq test-redis test-web
+          sh docker/wait-for-services.sh
       - name: Run tests
         run: docker-compose -f docker-compose.test.yml run --rm workflows
       - name: Stop docker
         run: docker-compode down
-    
+
 
