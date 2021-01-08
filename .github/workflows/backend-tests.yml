@@ -71,3 +71,4 @@ jobs:
         run: poetry install
       - name: Run tests
         run: py.test tests/integration/workflows
+
