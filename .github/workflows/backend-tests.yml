@@ -2,9 +2,11 @@ name: Build and release
 
 on:
   push:
-    - **
+    - add_github-actions
+    - master
   pull_request:
-    branches: [master]
+    branches:
+      - master
 
 env:
   APP_SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://inspirehep:inspirehep@localhost:5432/inspirehep
