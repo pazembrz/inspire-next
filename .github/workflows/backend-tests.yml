@@ -16,6 +16,7 @@ env:
   APP_CACHE_REDIS_URL: redis://localhost:6379/0
   APP_ACCOUNTS_SESSION_REDIS_URL: redis://localhost:6379/2
   APP_SEARCH_ELASTIC_HOSTS: localhost
+  LD_LIBRARY_PATH: /usr/local/lib/python2.7/dist-packages/pyxrootd/lib
 
 jobs:
   Test:
@@ -76,6 +77,7 @@ jobs:
           sudo apt-get install --assume-yes imagemagick transfig build-essential python python-dev python-pip pkg-config git python-dev cmake openssl libssl-dev uuid uuid-dev zlib1g zlib1g-dev
           pip install --upgrade pip setuptools wheel
           pip install xrootd
+
 #      - name: Install requirements
 #        run: poetry install -n -E all -E xrootd
       - name: Install requirements from poetry generated requirements.txt
@@ -83,6 +85,11 @@ jobs:
           poetry export --without-hashes -E all -E xrootd -f requirements.txt > requirements.poetry.txt
           pip install --ignore-installed --requirement requirements.poetry.txt
           pip install -e .
+      - name: display packages and libraries
+        run: |
+          pip freeze
+          echo $LD_LIBRARY_PATH
+          ldconfiv -v
       - name: Run tests
         run: poetry run py.test tests/integration/workflows
 
