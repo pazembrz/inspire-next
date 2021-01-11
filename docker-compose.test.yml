@@ -76,7 +76,7 @@ services:
     command: bash -c "flake8 inspirehep tests && py.test tests/unit && make -C docs html"
 
   workflows:
-    image: test-service_base
+    image: inspire-build/test-service_base
     command: py.test tests/integration/workflows
     depends_on:
       test-database:
