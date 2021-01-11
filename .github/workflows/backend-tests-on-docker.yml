@@ -26,15 +26,14 @@ jobs:
         with:
           fetch-depth: 0
       - name: pull images
-        run: docker-compose -f docker-compose.test.yml pull --parallel test-service_base
+        run: docker-compose -f docker-compose.test.yml pull test-service_base
       - name: Cache images
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
         with:
-          key: docker-cache
+          key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile", 'poetry.lock') }}
       - name: Build images
-        run: |
-          docker-compose -f docker-compose.test.yml build test-service_base
+        run: docker-compose -f docker-compose.test.yml build --force-rm test-service_base
 
   Workflows:
     runs-on: ubuntu-latest
@@ -70,7 +69,7 @@ jobs:
       - name: Cache images
         uses: satackey/action-docker-layer-caching@v0.0.11
         with:
-          key: docker-cache
+          key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile", 'poetry.lock') }}
       - name: Prepare docker
         run: |
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-redis
@@ -92,7 +91,7 @@ jobs:
       - name: Cache images
         uses: satackey/action-docker-layer-caching@v0.0.11
         with:
-          key: docker-cache
+          key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile", 'poetry.lock') }}
       - name: Prepare docker
         run: |
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-redis test-rabbitmq
@@ -114,7 +113,7 @@ jobs:
       - name: Cache images
         uses: satackey/action-docker-layer-caching@v0.0.11
         with:
-          key: docker-cache
+          key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile", 'poetry.lock') }}
       - name: Run tests
         run: docker-compose -f docker-compose.test.yml run --rm unit
       - name: Stop docker
