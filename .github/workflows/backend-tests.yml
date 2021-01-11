@@ -74,7 +74,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --assume-yes imagemagick transfig build-essential python python-dev python-pip pkg-config git python-dev cmake openssl libssl-dev uuid uuid-dev zlib1g zlib1g-dev
-          pip install --upgrade pip setuptools wheel xrootd
+          pip install --upgrade pip setuptools wheel
+          pip install xrootd
 #      - name: Install requirements
 #        run: poetry install -n -E all -E xrootd
       - name: Install requirements from poetry generated requirements.txt
