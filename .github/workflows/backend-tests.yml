@@ -89,7 +89,6 @@ jobs:
         run: |
           pip freeze
           echo $LD_LIBRARY_PATH
-          ldconfig -v
       - name: Run tests
         run: poetry run py.test tests/integration/workflows
 
