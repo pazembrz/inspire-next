@@ -57,8 +57,6 @@ jobs:
           sh docker/wait-for-services.sh
       - name: Run tests
         run: docker-compose -f docker-compose.test.yml run --rm workflows
-      - name: Stop docker
-        run: docker-compose down
 
   Integration:
     runs-on: ubuntu-latest
@@ -79,8 +77,6 @@ jobs:
           sh docker/wait-for-services.sh
       - name: Run tests
         run: docker-compose -f docker-compose.test.yml run --rm integration
-      - name: Stop docker
-        run: docker-compose down
 
   Integration-async:
     runs-on: ubuntu-latest
@@ -101,8 +97,6 @@ jobs:
           sh docker/wait-for-services.sh
       - name: Run tests
         run: docker-compose -f docker-compose.test.yml run --rm integration_async
-      - name: Stop docker
-        run: docker-compose down
 
   Unit:
     needs: Build
@@ -118,8 +112,6 @@ jobs:
           key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile', 'poetry.lock') }}
       - name: Run tests
         run: docker-compose -f docker-compose.test.yml run --rm unit
-      - name: Stop docker
-        run: docker-compose down
 
   Release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
