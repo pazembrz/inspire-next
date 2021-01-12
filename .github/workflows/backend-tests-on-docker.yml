@@ -141,12 +141,12 @@ jobs:
         with:
           fetch-depth: 0
       - name: Cache docker image
-          uses: actions/cache@v2.1.3
-          id: cache
-          with:
-            path: /tmp/docker-images
-            key: docker-images-cache-${{ github.sha }}
-      #          key: docker-images-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock') }}
+        uses: actions/cache@v2.1.3
+        id: cache
+        with:
+          path: /tmp/docker-images
+          key: docker-images-cache-${{ github.sha }}
+#          key: docker-images-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock') }}
       - name: deploy docker images
         run: sh deploy-docker--image.sh
 
