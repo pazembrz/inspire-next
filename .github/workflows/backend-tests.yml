@@ -52,14 +52,16 @@ jobs:
 #          path: ~/.cache/pypoetry/virtualenvs
 #          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
       - name: Install additional apps
+#        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install --assume-yes imagemagick transfig build-essential python-dev python-pip pkg-config git cmake openssl libssl-dev uuid uuid-dev xmlstarlet zlib1g zlib1g-dev
+          sudo apt-get install --assume-yes tree imagemagick transfig build-essential python-dev python-pip pkg-config git cmake openssl libssl-dev uuid uuid-dev xmlstarlet zlib1g zlib1g-dev
           pip install --upgrade pip setuptools wheel
           pip install xrootd==4.12.6
 #      - name: Install requirements
 #        run: poetry install -n -E all -E xrootd
       - name: Install requirements from poetry generated requirements.txt
+#        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           poetry export --without-hashes -E all -E xrootd -f requirements.txt > requirements.poetry.txt
           pip install --ignore-installed --requirement requirements.poetry.txt
