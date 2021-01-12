@@ -70,7 +70,6 @@ jobs:
         run: |
           pip freeze
           echo $LD_LIBRARY_PATH
-          tree -d -L 3 ${{ env.pythonLocation }}
 
 
   Workflows:
