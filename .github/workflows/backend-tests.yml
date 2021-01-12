@@ -40,11 +40,11 @@ jobs:
         with:
             poetry-version: 1.0.0
       - name: Cache Python
-          uses: actions/cache@v2.1.3
-          id: cache
-          with:
-            path: ${{ env.pythonLocation }}
-            key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
+        uses: actions/cache@v2.1.3
+        id: cache
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
 #      - name: Cache poetry env
 #        uses: actions/cache@v2.1.3
 #        id: cache
@@ -120,11 +120,11 @@ jobs:
         with:
           poetry-version: 1.0.0
       - name: Cache Python
-          uses: actions/cache@v2.1.3
-          id: cache
-          with:
-            path: ${{ env.pythonLocation }}
-            key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
+        uses: actions/cache@v2.1.3
+        id: cache
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
 
       - name: Fix ImageMagic policy for PDF
         run: sudo xmlstarlet ed -L -u "/policymap/policy[@pattern='PDF'][@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
@@ -180,11 +180,11 @@ jobs:
         with:
           poetry-version: 1.0.0
       - name: Cache Python
-          uses: actions/cache@v2.1.3
-          id: cache
-          with:
-            path: ${{ env.pythonLocation }}
-            key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
+        uses: actions/cache@v2.1.3
+        id: cache
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
 
       - name: Fix ImageMagic policy for PDF
         run: sudo xmlstarlet ed -L -u "/policymap/policy[@pattern='PDF'][@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
@@ -241,11 +241,11 @@ jobs:
         with:
           poetry-version: 1.0.0
       - name: Cache Python
-          uses: actions/cache@v2.1.3
-          id: cache
-          with:
-            path: ${{ env.pythonLocation }}
-            key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
+        uses: actions/cache@v2.1.3
+        id: cache
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
 
       - name: Fix ImageMagic policy for PDF
         run: sudo xmlstarlet ed -L -u "/policymap/policy[@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
@@ -272,11 +272,11 @@ jobs:
         with:
           poetry-version: 1.0.0
       - name: Cache Python
-          uses: actions/cache@v2.1.3
-          id: cache
-          with:
-            path: ${{ env.pythonLocation }}
-            key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
+        uses: actions/cache@v2.1.3
+        id: cache
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
 #      - name: Fix ImageMagic policy for PDF
 #        run: sudo xmlstarlet ed -L -u "/policymap/policy[@pattern='PDF'][@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
       - name: Run tests
