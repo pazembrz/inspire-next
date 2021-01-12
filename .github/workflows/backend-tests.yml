@@ -64,13 +64,13 @@ jobs:
 #        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           poetry export --without-hashes -E all -E xrootd -f requirements.txt > requirements.poetry.txt
-          pip install --ignore-installed --requirement requirements.poetry.txt
+          pip install --ignore-installed --src ${{ env.pythonLocation }}/lib/python2.7/site-packages/ --requirement requirements.poetry.txt
           pip install -e .
       - name: display packages and libraries
         run: |
           pip freeze
           echo $LD_LIBRARY_PATH
-          tree -d -L 2 ${{ env.pythonLocation }}
+          tree -d -L 3 ${{ env.pythonLocation }}
 
 
   Workflows:
