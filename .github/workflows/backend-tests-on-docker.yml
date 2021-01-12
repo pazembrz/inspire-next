@@ -27,15 +27,18 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Cache images
-        id: cache
-        uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
+#      - name: Cache images
+#        id: cache
+#        uses: satackey/action-docker-layer-caching@v0.0.11
+#        continue-on-error: true
+#        with:
+#          key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock') }}
+      - uses: whoan/docker-build-with-cache-action@v5
         with:
-          key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock') }}
-      - name: Build images
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: docker-compose -f services.yml build --force-rm base
+          compose_file: docker-compose.test.yml
+          build_extra_args: "--compress=true"
+#      - name: Build images
+#        run: docker-compose -f services.yml build --force-rm base
 
   Workflows:
     runs-on: ubuntu-latest
@@ -45,12 +48,14 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      # When this will be merged we will be able to disable post-cache push
-      # https://github.com/actions/cache/pull/498#issuecomment-753804797
-      - name: Cache images
-        uses: satackey/action-docker-layer-caching@v0.0.11
+#      - name: Cache images
+#        uses: satackey/action-docker-layer-caching@v0.0.11
+#        with:
+#          key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock') }}
+      - uses: whoan/docker-build-with-cache-action@v5
         with:
-          key: docker-cache
+          compose_file: docker-compose.test.yml
+          build_extra_args: "--compress=true"
       - name: Prepare docker
         run: |
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-rabbitmq test-redis
