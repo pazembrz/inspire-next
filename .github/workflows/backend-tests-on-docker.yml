@@ -33,6 +33,8 @@ jobs:
         continue-on-error: true
         with:
           key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock') }}
+      - name: DEBUG cache-hit
+        run: echo ${{ steps.cache.outputs.cache-hit }}
       - name: Build images
         if: steps.cache.outputs.cache-hit != 'true'
         run: docker-compose -f services.yml build --force-rm base

@@ -128,7 +128,7 @@ jobs:
       - name: Fix ImageMagic policy for PDF
         run: sudo xmlstarlet ed -L -u "/policymap/policy[@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
       - name: Run tests
-        run: poetry run py.test tests/integration/workflows
+        run: py.test tests/integration/workflows
   Integration:
     runs-on: ubuntu-18.04
     needs: Build
@@ -184,7 +184,7 @@ jobs:
       - name: Fix ImageMagic policy for PDF
         run: sudo xmlstarlet ed -L -u "/policymap/policy[@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
       - name: Run tests
-        run: poetry run py.test tests/integration --ignore tests/integration/workflows
+        run: py.test tests/integration --ignore tests/integration/workflows
 
   Integration-async:
     runs-on: ubuntu-18.04
@@ -241,7 +241,7 @@ jobs:
       - name: Fix ImageMagic policy for PDF
         run: sudo xmlstarlet ed -L -u "/policymap/policy[@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
       - name: Run tests
-        run: poetry run py.test tests/integration_async
+        run: py.test tests/integration_async
   Unit:
     runs-on: ubuntu-18.04
     needs: Build
@@ -267,6 +267,6 @@ jobs:
 #      - name: Fix ImageMagic policy for PDF
 #        run: sudo xmlstarlet ed -L -u "/policymap/policy[@pattern='PDF'][@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
       - name: Run tests
-        run: poetry run py.test tests/unit
+        run: py.test tests/unit
 
 
