@@ -108,9 +108,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install --assume-yes imagemagick transfig xmlstarlet zlib1g
       - name: Checkout
-          uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -127,7 +127,7 @@ jobs:
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
 
       - name: Fix ImageMagic policy for PDF
-        run: sudo xmlstarlet ed -L -u "/policymap/policy[@pattern='PDF'][@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
+        run: sudo xmlstarlet ed -L -u "/policymap/policy[@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
       - name: Run tests
         run: poetry run py.test tests/integration/workflows
   Integration:
@@ -168,9 +168,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install --assume-yes imagemagick transfig xmlstarlet zlib1g
       - name: Checkout
-          uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -187,7 +187,7 @@ jobs:
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
 
       - name: Fix ImageMagic policy for PDF
-        run: sudo xmlstarlet ed -L -u "/policymap/policy[@pattern='PDF'][@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
+        run: sudo xmlstarlet ed -L -u "/policymap/policy[@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
       - name: Run tests
         run: poetry run py.test tests/integration --ignore tests/integration/workflows
 
@@ -229,9 +229,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install --assume-yes imagemagick transfig xmlstarlet zlib1g
       - name: Checkout
-          uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -260,9 +260,9 @@ jobs:
           - 2.7
     steps:
       - name: Checkout
-          uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
