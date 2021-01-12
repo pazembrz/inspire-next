@@ -28,14 +28,14 @@ jobs:
         with:
           fetch-depth: 0
       - name: pull images
-        run: docker-compose pull base
+        run: docker-compose -f services.yml pull base
       - name: Cache images
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
         with:
           key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile', 'poetry.lock') }}
       - name: Build images
-        run: docker-compose build --force-rm base
+        run: docker-compose -f services.yml build --force-rm base
 
   Workflows:
     runs-on: ubuntu-latest
