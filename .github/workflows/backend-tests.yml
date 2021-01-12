@@ -44,7 +44,7 @@ jobs:
         id: cache
         with:
           path: ${{ env.pythonLocation }}
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-{{ hashFiles('poetry.lock') }}
 #      - name: Cache poetry env
 #        uses: actions/cache@v2.1.3
 #        id: cache
@@ -68,6 +68,7 @@ jobs:
         run: |
           pip freeze
           echo $LD_LIBRARY_PATH
+          echo ${{ env.pythonLocation }}
 
 
   Workflows:
