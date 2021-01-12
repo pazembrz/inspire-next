@@ -248,7 +248,7 @@ jobs:
             key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
 
       - name: Fix ImageMagic policy for PDF
-        run: sudo xmlstarlet ed -L -u "/policymap/policy[@pattern='PDF'][@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
+        run: sudo xmlstarlet ed -L -u "/policymap/policy[@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
       - name: Run tests
         run: poetry run py.test tests/integration_async
   Unit:
