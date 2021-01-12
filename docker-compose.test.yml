@@ -51,6 +51,7 @@ services:
       - LC_ALL=
       - APP_CRAWL_ONCE_PATH=/code/scrapy/crawl_once
 
+
   proxied_base:
     extends: test-service_base
     environment:
