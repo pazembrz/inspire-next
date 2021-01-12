@@ -74,10 +74,8 @@ jobs:
       - name: Install additional apps
         run: |
           sudo apt-get update
-          sudo apt-get install --assume-yes imagemagick transfig build-essential python python-dev python-pip pkg-config git python-dev cmake openssl libssl-dev uuid uuid-dev zlib1g zlib1g-dev
-          pip install --upgrade pip setuptools wheel
+          sudo apt-get install --assume-yes imagemagick transfig build-essential python python-dev python-pip pkg-config git python-dev cmake openssl libssl-dev uuid uuid-dev xmlstarlet zlib1g zlib1g-dev          pip install --upgrade pip setuptools wheel
           pip install xrootd==4.12.6
-
 #      - name: Install requirements
 #        run: poetry install -n -E all -E xrootd
       - name: Install requirements from poetry generated requirements.txt
@@ -89,6 +87,9 @@ jobs:
         run: |
           pip freeze
           echo $LD_LIBRARY_PATH
+      - name: Fix ImageMagic policy for PDF
+        run: sudo xmlstarlet ed -L -u "/policymap/policy[@pattern='PDF'][@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
+
       - name: Run tests
         run: poetry run py.test tests/integration/workflows
 
