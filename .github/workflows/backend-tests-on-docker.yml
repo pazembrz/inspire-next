@@ -152,8 +152,8 @@ jobs:
 #          key: docker-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile', 'poetry.lock') }}
       - name: Run tests
         run: |
-        docker load -i /tmp/docker-images/base.tar
-        docker-compose -f docker-compose.test.yml run --rm unit
+          docker load -i /tmp/docker-images/base.tar
+          docker-compose -f docker-compose.test.yml run --rm unit
 
   Release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
