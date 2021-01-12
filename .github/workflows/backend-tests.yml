@@ -52,7 +52,7 @@ jobs:
 #          path: ~/.cache/pypoetry/virtualenvs
 #          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ github.sha }}
       - name: Install additional apps
-#        if: steps.cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install --assume-yes tree imagemagick transfig build-essential python-dev python-pip pkg-config git cmake openssl libssl-dev uuid uuid-dev xmlstarlet zlib1g zlib1g-dev
@@ -61,7 +61,7 @@ jobs:
 #      - name: Install requirements
 #        run: poetry install -n -E all -E xrootd
       - name: Install requirements from poetry generated requirements.txt
-#        if: steps.cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           poetry export --without-hashes -E all -E xrootd -f requirements.txt > requirements.poetry.txt
           pip install --ignore-installed --src ${{ env.pythonLocation }}/lib/python2.7/site-packages/ --requirement requirements.poetry.txt
@@ -109,7 +109,7 @@ jobs:
       - name: Install additional apps
         run: |
           sudo apt-get update
-          sudo apt-get install --assume-yes imagemagick transfig xmlstarlet zlib1g
+          sudo apt-get install --assume-yes tree imagemagick transfig xmlstarlet zlib1g
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -124,7 +124,8 @@ jobs:
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-{{ hashFiles('poetry.lock') }}
-
+      - name: List python env folder
+        run:  tree -d -L 4 ${{ env.pythonLocation }}
       - name: Fix ImageMagic policy for PDF
         run: sudo xmlstarlet ed -L -u "/policymap/policy[@domain='coder']/@rights" -v 'read|write' /etc/ImageMagick-6/policy.xml
       - name: Run tests
