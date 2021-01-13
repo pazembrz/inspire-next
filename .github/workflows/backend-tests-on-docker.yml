@@ -52,7 +52,8 @@ jobs:
         with:
           path: /tmp/docker-images
 #          key: docker-images-cache-${{ github.sha }}
-          key: docker-images-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}      - name: Prepare docker
+          key: docker-images-cache-${{ hashFiles('services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
+      - name: Prepare docker
         run: |
           docker load -i /tmp/docker-images/base.tar
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-rabbitmq test-redis
