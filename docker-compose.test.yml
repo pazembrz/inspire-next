@@ -50,6 +50,10 @@ services:
       - LC_IDENTIFICATION=en_US.UTF-8
       - LC_ALL=
       - APP_CRAWL_ONCE_PATH=/code/scrapy/crawl_once
+    volumes:
+      - ./inspirehep:/code/inspirehep
+      - ./scripts:/code/scripts
+      - ./tests:/code/tests
 
 
   proxied_base:
