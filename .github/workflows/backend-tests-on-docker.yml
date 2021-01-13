@@ -59,7 +59,8 @@ jobs:
           docker-compose -f docker-compose.test.yml up -d test-database test-indexer test-rabbitmq test-redis test-web
           sh docker/wait-for-services.sh
       - name: Run tests
-        run: docker-compose -f docker-compose.test.yml run --rm workflows py.test tests/integration/workflows \
+        run: |
+          docker-compose -f docker-compose.test.yml run --rm workflows py.test tests/integration/workflows \
           --ignore tests/integration/workflows/test_audit.py \
           --ignore tests/integration/workflows/test_hep_approval.py \
           --ignore tests/integration/workflows/test_submissions_views.py \
@@ -93,7 +94,8 @@ jobs:
           docker-compose -f docker-compose.test.yml up -d test-database test-indexer test-rabbitmq test-redis test-web
           sh docker/wait-for-services.sh
       - name: Run tests
-        run: docker-compose -f docker-compose.test.yml run --rm workflows py.test tests/integration/workflows \
+        run: |
+          docker-compose -f docker-compose.test.yml run --rm workflows py.test tests/integration/workflows \
           --ignore tests/integration/workflows/test_arxiv_merge.py \
           --ignore tests/integration/workflows/test_authors_workflow.py \
           --ignore tests/integration/workflows/test_edit_article.py\
