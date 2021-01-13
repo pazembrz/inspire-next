@@ -98,7 +98,7 @@ jobs:
           docker-compose -f docker-compose.test.yml run --rm workflows py.test tests/integration/workflows \
           --ignore tests/integration/workflows/test_arxiv_merge.py \
           --ignore tests/integration/workflows/test_authors_workflow.py \
-          --ignore tests/integration/workflows/test_edit_article.py\
+          --ignore tests/integration/workflows/test_edit_article.py \
           --ignore tests/integration/workflows/test_utils.py \
           --ignore tests/integration/workflows/test_workflow_utils.py
 
