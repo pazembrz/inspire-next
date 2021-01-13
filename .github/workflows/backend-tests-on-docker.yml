@@ -167,7 +167,7 @@ jobs:
 
   Release:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    needs: [Unit, Integration-async, Integration, Workflows]
+    needs: [Unit, Integration-async, Integration, Workflows-I, Workflows-II]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
