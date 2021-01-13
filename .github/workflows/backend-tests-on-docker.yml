@@ -62,14 +62,13 @@ jobs:
         run: |
           docker-compose -f docker-compose.test.yml run --rm workflows py.test tests/integration/workflows \
           --ignore tests/integration/workflows/test_audit.py \
-          --ignore tests/integration/workflows/test_hep_approval.py \
-          --ignore tests/integration/workflows/test_submissions_views.py \
-          --ignore tests/integration/workflows/test_workflows_cli.py \
-          --ignore tests/integration/workflows/test_workflows_manual_merge.py \
-          --ignore tests/integration/workflows/test_workflows_tasks_upload.py \
-          --ignore tests/integration/workflows/test_arxiv_workflow.py \
-          --ignore tests/integration/workflows/test_edit_article.py \
-          --ignore tests/integration/workflows/test_views.py
+            --ignore tests/integration/workflows/test_hep_approval.py \
+            --ignore tests/integration/workflows/test_submissions_views.py \
+            --ignore tests/integration/workflows/test_workflows_manual_merge.py \
+            --ignore tests/integration/workflows/test_workflows_tasks_upload.py \
+            --ignore tests/integration/workflows/test_arxiv_workflow.py \
+            --ignore tests/integration/workflows/test_edit_article.py \
+            --ignore tests/integration/workflows/test_views.py
 
   Workflows-II:
     runs-on: ubuntu-latest
@@ -100,6 +99,7 @@ jobs:
           --ignore tests/integration/workflows/test_article_workflow.py \
           --ignore tests/integration/workflows/test_utils.py \
           --ignore tests/integration/workflows/test_workflows_tasks_actions.py \
+          --ignore tests/integration/workflows/test_workflows_cli.py \
           --ignore tests/integration/workflows/test_workflow_utils.py
 
   Integration:
