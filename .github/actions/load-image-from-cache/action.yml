@@ -1,0 +1,13 @@
+name: Load image from cache
+description: Uncompress and load base image from cache
+
+runs:
+  using: composite
+  steps:
+    - name: Install lrzip
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y lrzip
+
+    - name: Install requirements
+      run: lrz -d -c /tmp/docker-images/base.lz | docker load
