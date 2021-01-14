@@ -38,7 +38,7 @@ jobs:
         run: |
           mkdir -p /tmp/docker-images
           docker save inspire-build/inspire-next-base -o /tmp/base.tar
-          lrz -k -P -l base.tar -o /tmp/docker-images/base.lz
+          lrz -k -P -l /tmp/base.tar -o /tmp/docker-images/base.lz
 
 
   Workflows-I:
