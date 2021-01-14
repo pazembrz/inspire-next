@@ -40,7 +40,6 @@ jobs:
           mkdir -p /tmp/docker-images
           docker save inspire-build/inspire-next-base |lrz -l -o /tmp/docker-images/base.lz
 
-
   Workflows-I:
     runs-on: ubuntu-latest
     needs: Build
