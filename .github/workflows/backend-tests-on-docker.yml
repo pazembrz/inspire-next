@@ -28,7 +28,7 @@ jobs:
 
       - name: Build images
         if: steps.cache.outputs.cache-hit != 'true'
-        run: docker-compose -f services.yml build --compress --force-rm base
+        run: docker-compose -f services.yml build --force-rm base
       - name: Install lrzip
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
