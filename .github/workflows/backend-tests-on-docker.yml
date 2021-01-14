@@ -32,7 +32,7 @@ jobs:
       - name: Install lrzip
         run: |
           sudo apt-get update
-          sudo apt-get install lrzip
+          sudo apt-get install -y lrzip
       - name: Save image
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
@@ -55,6 +55,10 @@ jobs:
         with:
           path: /tmp/docker-images
           key: docker-images-cache-${{ hashFiles('.github/workflows/backend-tests-on-docker', 'services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
+      - name: Install lrzip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lrzip
       - name: Prepare docker
         run: |
           lrz -d -c /tmp/docker-images/base.lz | docker load
@@ -88,6 +92,10 @@ jobs:
         with:
           path: /tmp/docker-images
           key: docker-images-cache-${{ hashFiles('.github/workflows/backend-tests-on-docker', 'services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
+      - name: Install lrzip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lrzip
       - name: Prepare docker
         run: |
           lrz -d -c /tmp/docker-images/base.lz | docker load
@@ -120,6 +128,10 @@ jobs:
         with:
           path: /tmp/docker-images
           key: docker-images-cache-${{ hashFiles('.github/workflows/backend-tests-on-docker', 'services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
+      - name: Install lrzip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lrzip
       - name: Prepare docker
         run: |
           lrz -d -c /tmp/docker-images/base.lz | docker load
@@ -143,6 +155,10 @@ jobs:
         with:
           path: /tmp/docker-images
           key: docker-images-cache-${{ hashFiles('.github/workflows/backend-tests-on-docker', 'services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
+      - name: Install lrzip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lrzip
       - name: Prepare docker
         run: |
           lrz -d -c /tmp/docker-images/base.lz | docker load
@@ -166,6 +182,10 @@ jobs:
         with:
           path: /tmp/docker-images
           key: docker-images-cache-${{ hashFiles('.github/workflows/backend-tests-on-docker', 'services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
+      - name: Install lrzip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lrzip
       - name: Run tests
         run: |
           lrz -d -c /tmp/docker-images/base.lz | docker load
