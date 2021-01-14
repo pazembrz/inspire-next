@@ -57,7 +57,6 @@ jobs:
           key: docker-images-cache-${{ hashFiles('.github/workflows/backend-tests-on-docker', 'services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
       - name: Prepare docker
         run: |
-#          docker load -i /tmp/docker-images/base.tar
           lrz -d -c /tmp/docker-images/base.lz | docker load
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-rabbitmq test-redis
           docker-compose -f docker-compose.test.yml build --parallel workflows test-web
@@ -91,7 +90,6 @@ jobs:
           key: docker-images-cache-${{ hashFiles('.github/workflows/backend-tests-on-docker', 'services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
       - name: Prepare docker
         run: |
-#          docker load -i /tmp/docker-images/base.tar
           lrz -d -c /tmp/docker-images/base.lz | docker load
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-rabbitmq test-redis
           docker-compose -f docker-compose.test.yml build --parallel workflows test-web
@@ -124,7 +122,6 @@ jobs:
           key: docker-images-cache-${{ hashFiles('.github/workflows/backend-tests-on-docker', 'services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
       - name: Prepare docker
         run: |
-#          docker load -i /tmp/docker-images/base.tar
           lrz -d -c /tmp/docker-images/base.lz | docker load
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-redis
           docker-compose -f docker-compose.test.yml up -d test-database test-indexer test-redis
@@ -148,7 +145,6 @@ jobs:
           key: docker-images-cache-${{ hashFiles('.github/workflows/backend-tests-on-docker', 'services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
       - name: Prepare docker
         run: |
-#          docker load -i /tmp/docker-images/base.tar
           lrz -d -c /tmp/docker-images/base.lz | docker load
           docker-compose -f docker-compose.test.yml pull --parallel test-database test-indexer test-redis test-rabbitmq
           docker-compose -f docker-compose.test.yml up -d test-database test-indexer test-redis test-rabbitmq
@@ -172,7 +168,6 @@ jobs:
           key: docker-images-cache-${{ hashFiles('.github/workflows/backend-tests-on-docker', 'services.yml', 'docker-compose.test.yml', 'Dockerfile.dev', 'poetry.lock', 'setup.py', 'setup.cfg') }}
       - name: Run tests
         run: |
-#          docker load -i /tmp/docker-images/base.tar
           lrz -d -c /tmp/docker-images/base.lz | docker load
           docker-compose -f docker-compose.test.yml run --rm unit
 
